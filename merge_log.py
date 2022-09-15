@@ -6,6 +6,12 @@ from tqdm import tqdm
 
 USER_LOG_FMT = "merged_{}.log"
 
+def get_basename(path):
+	path, tail = os.path.split(path)
+	while tail == "":
+		path, tail = os.path.split(path)
+	return tail
+
 def write_log_file(filename, fout):
 	with open(filename, 'r', encoding='utf-8') as fin:
 		for line in fin:
@@ -33,7 +39,7 @@ def traverseUserFolder(dirpath, output_dirpath):
 				pass
 	if len(folder_list) > 0:
 		folder_list.sort()
-		user = os.path.split(dirpath)[-1]
+		user = get_basename(dirpath)
 		print(f"Merging user folder: {user}")
 		print(folder_list)
 		output_filepath = os.path.join(output_dirpath, USER_LOG_FMT.format(user))
