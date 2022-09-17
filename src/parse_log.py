@@ -1,11 +1,13 @@
 import argparse
 import os
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
+
+beijingTimeZone = timezone(timedelta(hours=8))
 
 def parse_line(line):
 	paras = line.strip().split('\t')
 	timestamp = int(paras[0])
-	date_object = datetime.fromtimestamp(timestamp/1000)
+	date_object = datetime.fromtimestamp(timestamp/1000, tz=beijingTimeZone)
 	return date_object.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
 
 def parse_log(filepath):
