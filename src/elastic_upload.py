@@ -5,15 +5,25 @@ from elasticsearch import Elasticsearch
 
 def load_config(filename):
 	with open(filename, 'r', encoding='utf-8') as fin:
-		return yaml.safe_load(fin)
-
+		config = yaml.safe_load(fin)
+	## 填充缺省值
+	## 默认用户名为elastic
+	if 'username' not in config:
+		config['username'] = 'elastic'
+	## 默认检查服务器证书
+	if 'verify_certs' not in config:
+		config['verify_certs'] = True
+	## 默认证书地址为当前目录下的http_ca.crt
+	if 'certificate_path' not in config:
+		config['certificate_path'] = 'http_ca.crt'
+	return config
 
 def main(args):
 	config = load_config(args.config)
 	# Create the client instance
 	client = Elasticsearch(
 		config['host'],
-		verify_certs=False,
+		verify_certs=config['verify_certs'],
 		ca_certs=config['certificate_path'],
 		basic_auth=(config['username'], config['password'])
 	)
