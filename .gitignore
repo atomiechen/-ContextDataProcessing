@@ -3,3 +3,4 @@ __pycache__
 *.log
 config.yml
 http_ca.crt
+_uploaded_list.txt
