@@ -5,7 +5,7 @@ elastic:
   username: elastic
   password: <PASSWORD>  ## required
   host: https://localhost:9200
-  verify_certs: True
+  verify_certs: true
   certificate_path: http_ca.crt
   index: <INVALID_INDEX>  ## required
 
