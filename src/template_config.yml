@@ -3,12 +3,12 @@
 ## fill in a new copy instead.
 elastic:
   username: elastic
-  password: <password>  ## required
+  password: <PASSWORD>  ## required
   host: https://localhost:9200
   verify_certs: True
   certificate_path: http_ca.crt
-  index: INVALID_INDEX  ## required
+  index: <INVALID_INDEX>  ## required
 
 data:
-  filepath: <logfile>  ## required
-  userid: <userid>  ## required
+  filepath: <LOG_FILE_PATH>  ## required
+  userid: <USER_ID>  ## required
