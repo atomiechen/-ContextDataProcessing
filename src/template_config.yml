@@ -7,6 +7,7 @@ elastic:
   host: https://localhost:9200
   verify_certs: True
   certificate_path: http_ca.crt
+  index: INVALID_INDEX  ## required
 
 data:
   filepath: <logfile>  ## required

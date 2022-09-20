@@ -62,7 +62,7 @@ def main(args):
 	progress = tqdm.tqdm(unit="docs")
 	try:
 		for success, info in streaming_bulk(
-			client=client, actions=gen_doc(filepath, userid), index='log_volume'):
+			client=client, actions=gen_doc(filepath, userid), index=cfg_elastic['index']):
 			progress.update(1)
 			successes += success
 			if not success:
