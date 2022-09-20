@@ -1,0 +1,13 @@
+## Template configuration.
+## Do not modify this file when connecting to Elastic cluster,
+## fill in a new copy instead.
+elastic:
+  username: elastic
+  password: <password>  ## required
+  host: https://localhost:9200
+  verify_certs: True
+  certificate_path: http_ca.crt
+
+data:
+  filepath: <logfile>  ## required
+  userid: <userid>  ## required
