@@ -12,3 +12,4 @@ elastic:
 data:
   filepath: <LOG_FILE_PATH>  ## required
   userid: <USER_ID>  ## required
+  watching_dir: .  ## watching folder for file changes, current directory by default

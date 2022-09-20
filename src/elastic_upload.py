@@ -1,82 +1,53 @@
 import argparse
-import yaml
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import streaming_bulk
-import tqdm
-import copy
+
+from utils import load_config
 
 
-## 加载模板配置文件
-TEMPLATE_PATH = "template_config.yml"
-with open(TEMPLATE_PATH, 'r', encoding='utf-8') as fin:
-	BLANK = yaml.safe_load(fin)
+class ElasticUploader:
+	def __init__(self, config):
+		self.config = config['elastic']
+		self.total_docs = 0
+		# Create the client instance
+		self.client = Elasticsearch(
+			self.config['host'],
+			verify_certs=self.config['verify_certs'],
+			ca_certs=self.config['certificate_path'],
+			basic_auth=(self.config['username'], self.config['password'])
+		)
+		# Successful response!
+		print(self.client.info())
 
-## recursion, fill dict_target according to dict_default
-def __recurse(dict_default, dict_target):
-	for key in dict_default:
-		if key in dict_target:
-			if dict_target[key] is None:
-				dict_target[key] = copy.deepcopy(dict_default[key])
-			elif isinstance(dict_default[key], dict):
-				__recurse(dict_default[key], dict_target[key])
-		else:
-			dict_target[key] = copy.deepcopy(dict_default[key])
+	def gen_doc(self, filepath, userid):
+		self.total_docs = 0  ## count non-empty documents
+		with open(filepath, 'r', encoding='utf-8') as fin:
+			for line in fin:
+				## remove empty lines
+				if line.strip() != "":
+					self.total_docs += 1
+					yield {"message": line, "userid": userid}
 
-## 加载配置文件，填充缺省值
-def load_config(filepath):
-	with open(filepath, 'r', encoding='utf-8') as fin:
-		config = yaml.safe_load(fin)
-	## 填充缺省值
-	__recurse(BLANK, config)
-	return config
+	def upload(self, filepath, userid):
+		successes = 0
+		try:
+			for success, info in streaming_bulk(
+				client=self.client, actions=self.gen_doc(filepath, userid), index=self.config['index']):
+				successes += success
+				if not success:
+					print('A document failed:', info)
+		except Exception as e:
+			print(e)
+		print(f"Indexed {successes}/{self.total_docs} documents")
 
-total_docs = 0  ## count non-empty documents
-def gen_doc(filepath, userid):
-	global total_docs
-	with open(filepath, 'r', encoding='utf-8') as fin:
-		for line in fin:
-			## remove empty lines
-			if line.strip() != "":
-				total_docs += 1
-				yield {"message": line, "userid": userid}
 
 def main(args):
 	config = load_config(args.config)
-	cfg_elastic = config['elastic']
-	# Create the client instance
-	client = Elasticsearch(
-		cfg_elastic['host'],
-		verify_certs=cfg_elastic['verify_certs'],
-		ca_certs=cfg_elastic['certificate_path'],
-		basic_auth=(cfg_elastic['username'], cfg_elastic['password'])
-	)
-
-	# Successful response!
-	print(client.info())
-
+	uploader = ElasticUploader(config)
 	## get data info from config
 	filepath = config['data']['filepath']
 	userid = config['data']['userid']
-
-	successes = 0
-	progress = tqdm.tqdm(unit="docs")
-	try:
-		for success, info in streaming_bulk(
-			client=client, actions=gen_doc(filepath, userid), index=cfg_elastic['index']):
-			progress.update(1)
-			successes += success
-			if not success:
-				print('A document failed:', info)
-	except Exception as e:
-		print(e)
-	print(f"Indexed {successes}/{total_docs} documents")
-
-
-	# doc = {
-	# 	'message': '1662724635868	36	KeyEvent	KeyEvent://1/25		{\"keycodeString\":\"KEYCODE_VOLUME_DOWN\",\"package\":\"\",\"action\":1,\"source\":257,\"code\":25,\"eventTime\":2583640595,\"downTime\":2583640463}', 'userid': 'test_user_id'
-	# }
-	# resp = client.index(index="log_volume", document=doc)
-	# print(resp)
+	uploader.upload(filepath, userid)
 
 
 if __name__ == '__main__':
