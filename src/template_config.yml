@@ -14,3 +14,4 @@ data:
   userid: <USER_ID>  ## required
   watching_dir: .  ## watching folder for file changes, current directory by default
   uploaded_list_path: _uploaded_list.txt  ## uploaded file list
+  log_dir: ./_logs  ## directory to save logs

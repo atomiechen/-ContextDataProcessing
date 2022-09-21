@@ -1,4 +1,5 @@
 import argparse
+from logging import Logger
 import os
 import time
 import json
@@ -9,13 +10,17 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler, FileSystemEvent
 
 from elastic_upload import ElasticUploader
-from utils import load_config, Beijing_timezone
+from utils import load_config, init_logger, init_stdout_logger
 
 
 class UploadHandler(FileSystemEventHandler):
-	def __init__(self, config: dict, executor: Executor):
+	def __init__(self, config: dict, executor: Executor, logger: Logger = None):
 		super().__init__()
-		self.uploader = ElasticUploader(config)
+		if logger:
+			self.logger = logger
+		else:
+			self.logger = init_stdout_logger("UploadHandler")
+		self.uploader = ElasticUploader(config, self.logger)
 		self.executor = executor
 		self.set_lock = threading.Lock()
 		
@@ -30,7 +35,7 @@ class UploadHandler(FileSystemEventHandler):
 
 
 	def on_any_event(self, event: FileSystemEvent):
-		print(f'{datetime.now(tz=Beijing_timezone)} Event: {event.event_type} Path: {event.src_path}')
+		self.logger.info(f'Event: {event.event_type} Path: {event.src_path}')
 		if event.event_type == 'created':
 			### 受到新建文件事件后，总是重新上传以更新文档，因此force_upload=True
 			ft = self.executor.submit(self.check_and_upload, event.src_path, True)
@@ -67,11 +72,11 @@ class UploadHandler(FileSystemEventHandler):
 						with self.set_lock:
 							self.uploaded_set.add(abs_path)
 							self.write_uploaded_list()
-						print(f"{datetime.now(tz=Beijing_timezone)} Uploaded: {abs_path}")
+						self.logger.info(f"Uploaded: {abs_path}")
 					else:
-						print(f"{datetime.now(tz=Beijing_timezone)} Failed to upload: {abs_path}")
+						self.logger.error(f"Failed to upload: {abs_path}")
 				except Exception as e:
-					print(f"{datetime.now(tz=Beijing_timezone)} Failed to upload: {abs_path}, with exception: {e}")
+					self.logger.exception(f"Failed to upload: {abs_path}, with exception: {e}")
 
 	def write_uploaded_list(self):
 		with open(self.uploaded_list_path, 'w', encoding='utf-8') as fout:
@@ -79,8 +84,9 @@ class UploadHandler(FileSystemEventHandler):
 				fout.write(item + "\n")
 
 	def schedule_upload_folder(self, dirpath):
+		self.logger.info(f"Start uploading folder: {dirpath}")
 		return self.executor.submit(self.traverse_folder, dirpath).add_done_callback(
-			lambda ft: print(f"{datetime.now(tz=Beijing_timezone)} Upload folder done.")
+			lambda ft: self.logger.info(f"Folder uploaded: {dirpath}")
 			)
 
 	def traverse_folder(self, dirpath):
@@ -97,14 +103,14 @@ class UploadHandler(FileSystemEventHandler):
 def main(args):
 	config = load_config(args.config)
 	watching_path = config['data']['watching_dir']
+	logger = init_logger('context-upload-elastic', config['data']['log_dir'])
 	with ThreadPoolExecutor() as executor:
-		event_handler = UploadHandler(config, executor)
+		event_handler = UploadHandler(config, executor, logger)
+		event_handler.schedule_upload_folder(watching_path)
 		observer = Observer()
 		observer.schedule(event_handler, watching_path, recursive=True)
 		observer.start()
-		print(f"{datetime.now(tz=Beijing_timezone)} Watching for path: {watching_path}")
-		print(f"{datetime.now(tz=Beijing_timezone)} Uploading files in path: {watching_path}")
-		event_handler.schedule_upload_folder(watching_path)
+		logger.info(f"Watching events for folder: {watching_path}")
 		try:
 			while True:
 				time.sleep(1)

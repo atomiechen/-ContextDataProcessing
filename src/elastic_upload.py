@@ -1,12 +1,13 @@
 import argparse
+from logging import Logger
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import streaming_bulk
 
-from utils import load_config
+from utils import load_config, init_stdout_logger
 
 
 class ElasticUploader:
-	def __init__(self, config: dict):
+	def __init__(self, config: dict, logger: Logger = None):
 		self.config = config['elastic']
 		self.total_docs = 0
 		# Create the client instance
@@ -16,8 +17,12 @@ class ElasticUploader:
 			ca_certs=self.config['certificate_path'],
 			basic_auth=(self.config['username'], self.config['password'])
 		)
+		if logger:
+			self.logger = logger
+		else:
+			self.logger = init_stdout_logger("ElasticUploader")
 		# Successful response!
-		print(self.client.info())
+			self.logger.info(self.client.info())
 
 	def gen_doc(self, filepath: str, userid: str):
 		with open(filepath, 'r', encoding='utf-8') as fin:
@@ -37,10 +42,10 @@ class ElasticUploader:
 				client=self.client, actions=self.gen_doc(filepath, userid), index=self.config['index']):
 				successes += success
 				if not success:
-					print('A document failed:', info)
+					self.logger.info('A document failed:', info)
 		except Exception as e:
-			print(e)
-		print(f"Indexed {successes}/{total_docs} documents")
+			self.logger.exception(e)
+		self.logger.info(f"Indexed {successes}/{total_docs} documents")
 		return total_docs == successes
 
 
