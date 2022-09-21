@@ -1,0 +1,10 @@
+version: "3"
+
+services:
+  context-watch-upload-elastic:
+    build: .
+    volumes:
+      - ./data:/data  ## TODO: change host data volume path on use
+      - ./src:/src
+    restart: always
+    network_mode: host
