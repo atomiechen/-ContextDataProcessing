@@ -3,8 +3,7 @@ from logging import Logger
 import os
 import time
 import json
-from datetime import datetime
-from concurrent.futures import Executor, ThreadPoolExecutor
+from concurrent.futures import Executor, Future, ThreadPoolExecutor
 import threading
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler, FileSystemEvent
@@ -86,8 +85,15 @@ class UploadHandler(FileSystemEventHandler):
 	def schedule_upload_folder(self, dirpath):
 		self.logger.info(f"Start uploading folder: {dirpath}")
 		return self.executor.submit(self.traverse_folder, dirpath).add_done_callback(
-			lambda ft: self.logger.info(f"Folder uploaded: {dirpath}")
+			lambda ft: self.upload_folder_callback(ft, dirpath)
 			)
+	
+	def upload_folder_callback(self, future: Future, dirpath):
+		try:
+			future.result()
+			self.logger.info(f"Folder uploaded: {dirpath}")
+		except Exception as e:
+			self.logger.exception(f"Failed to upload folder: {dirpath}, Exception: {e}")
 
 	def traverse_folder(self, dirpath):
 		if not os.path.isdir(dirpath):
@@ -95,7 +101,7 @@ class UploadHandler(FileSystemEventHandler):
 		for item in os.listdir(dirpath):
 			full_path = os.path.join(dirpath, item)
 			if os.path.isdir(full_path):
-				self.traverse_foler(full_path)
+				self.traverse_folder(full_path)
 			else:
 				self.check_and_upload(full_path)
 
