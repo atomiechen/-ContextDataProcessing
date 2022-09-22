@@ -1,0 +1,20 @@
+version: "3"
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.4.1
+    ports:
+      - 19213:9200
+      - 19313:9300
+    environment:
+      - "ES_JAVA_OPTS=-Xms4g -Xmx4g"  # 内存设置，最大和最小heap size都是4G
+      - "discovery.type=single-node" # 以单一节点模式启动
+    restart: always
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.4.1
+    ports:
+      - 15613:5601
+    depends_on:
+      - elasticsearch
+    restart: always
