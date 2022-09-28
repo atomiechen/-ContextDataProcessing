@@ -60,7 +60,6 @@ class IMUUploadHandler(UploadHandler):
                     f0.write(json.dumps(cur))
                     f0.write("\n")
                 f.close()
-                f0.close()
             return new_dir + data_filename.replace(".bin", ".txt")
         elif data_filename.split(".")[-1] == "meta":
             with open(os.path.join(data_dir, data_filename), "r", encoding='utf-8', errors='ignore') as f:
@@ -69,8 +68,6 @@ class IMUUploadHandler(UploadHandler):
                 data_filename = ".".join(data_filename)
                 with open(new_dir + data_filename, "w", encoding='utf-8', errors='ignore') as f0:
                     f0.writelines(f.readlines())
-                    f0.close()
-                f.close()
             return new_dir + data_filename
 
     def on_any_event(self, event: FileSystemEvent):
