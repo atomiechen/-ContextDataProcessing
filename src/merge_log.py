@@ -20,6 +20,7 @@ def write_log_file(filename, fout):
 		for line in fin:
 			if line.strip() != "":
 				fout.write(line)
+		fin.close()
 
 def merge_for_each_subfolder(dirpath, output_dirpath):
 	if not os.path.isdir(dirpath):
@@ -61,6 +62,7 @@ def merge_logs(file_list, output_filepath):
 	with open(output_filepath, 'w', encoding='utf-8') as fout:
 		for filename in tqdm(file_list):
 			write_log_file(filename, fout)
+		fout.close()
 
 def main(args):
 	dirpath = args.dirpath

@@ -28,6 +28,7 @@ class UploadHandler(FileSystemEventHandler):
 			self.uploaded_list_path = config['data']['uploaded_list_path']
 			with open(self.uploaded_list_path, 'r', encoding='utf-8') as fin:
 				self.uploaded_set = set(line.strip() for line in fin)
+				fin.close()
 		except:
 			self.uploaded_list_path = "_uploaded_list.txt"
 			self.uploaded_set = set()
@@ -65,6 +66,7 @@ class UploadHandler(FileSystemEventHandler):
 				try:
 					with open(meta_path, 'r', encoding='utf-8') as fin:
 						data = json.load(fin)
+						fin.close()
 					userid = data['userId']
 					if self.uploader.upload(abs_path, userid):
 						## record this uploaded file
@@ -81,6 +83,7 @@ class UploadHandler(FileSystemEventHandler):
 		with open(self.uploaded_list_path, 'w', encoding='utf-8') as fout:
 			for item in self.uploaded_set:
 				fout.write(item + "\n")
+			fout.close()
 
 	def schedule_upload_folder(self, dirpath):
 		self.logger.info(f"Start uploading folder: {dirpath}")

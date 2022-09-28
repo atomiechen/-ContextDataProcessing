@@ -20,6 +20,8 @@ def parse_log(filepath):
 			for line in fin:
 				date_str = parse_line(line)
 				fout.write(date_str + '\t' + line)
+			fout.close()
+		fin.close()
 
 def main(args):
 	for filepath in args.filepath:

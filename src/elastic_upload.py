@@ -30,6 +30,7 @@ class ElasticUploader:
 				## remove empty lines
 				if line.strip() != "":
 					yield {"message": line, "userid": userid}
+			fin.close()
 
 	def upload(self, filepath: str, userid: str):
 		total_docs = -1
@@ -38,6 +39,7 @@ class ElasticUploader:
 		try:
 			with open(filepath, 'r', encoding='utf-8') as fin:
 				total_docs = sum(1 for line in fin if line.strip())
+				fin.close()
 			for success, info in streaming_bulk(
 				client=self.client, actions=self.gen_doc(filepath, userid), index=self.config['index']):
 				successes += success

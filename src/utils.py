@@ -11,6 +11,7 @@ from logging.handlers import TimedRotatingFileHandler
 TEMPLATE_PATH = "template_config.yml"
 with open(TEMPLATE_PATH, 'r', encoding='utf-8') as fin:
 	BLANK = yaml.safe_load(fin)
+	fin.close()
 
 ## recursion, fill dict_target according to dict_default
 def __recurse(dict_default, dict_target):
@@ -27,6 +28,7 @@ def __recurse(dict_default, dict_target):
 def load_config(filepath):
 	with open(filepath, 'r', encoding='utf-8') as fin:
 		config = yaml.safe_load(fin)
+		fin.close()
 	## 填充缺省值
 	__recurse(BLANK, config)
 	return config

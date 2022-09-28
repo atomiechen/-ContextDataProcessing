@@ -28,43 +28,49 @@ class IMUUploadHandler(UploadHandler):
             os.mkdir(new_dir)
 
         data_dir = path.split("/")
-        data_filename = data_dir[-1]
-        data_dir[-1] = ""
-        data_dir = "/".join(data_dir)
+        data_filename = data_dir[-1].split("\\")[-1]
+        data_dir[-1] = data_dir[-1].split("\\")[0]
+        data_dir = "/".join(data_dir) + "/"
         filenames = os.listdir(data_dir)
 
         if data_filename.split(".")[-1] == "bin":
-            reason_filename = data_filename + ".meta"
-            if reason_filename in filenames:
-                with open(os.path.join(data_dir, reason_filename), "r") as f:
-                    commits = json.loads(f.readline())
-                    reason = commits["commit"].split("\n")[-1]
-                with open(new_dir + data_filename.replace(".bin", ".txt"), "w") as f0:
-                    f = open(os.path.join(data_dir, data_filename), 'rb')
-                    flag = True
-                    while flag:
-                        cur = []
-                        for i in range(4):
-                            tmp = f.read(4)
-                            if len(tmp) < 4:
-                                flag = False
-                                break
-                            cur.append(struct.unpack('>f', tmp)[0])
-                        tmp = f.read(8)
-                        if len(tmp) < 8:
+            # reason_filename = data_filename + ".meta"
+            # if reason_filename in filenames:
+                # with open(os.path.join(data_dir, reason_filename), "r") as f:
+                #     commits = json.loads(f.readline())
+                #     reason = commits["commit"].split("\n")[-1]
+            with open(new_dir + data_filename.replace(".bin", ".txt"), "w", encoding='utf-8', errors='ignore') as f0:
+                f = open(os.path.join(data_dir, data_filename), 'rb')
+                flag = True
+                while flag:
+                    cur = []
+                    for i in range(4):
+                        tmp = f.read(4)
+                        if len(tmp) < 4:
                             flag = False
-                            continue
-                        cur.append(struct.unpack('>d', tmp)[0])
-                        if len(cur) < 5:
-                            continue
-                        f0.write(json.dumps(cur))
-                        f0.write("\n")
+                            break
+                        cur.append(struct.unpack('>f', tmp)[0])
+                    tmp = f.read(8)
+                    if len(tmp) < 8:
+                        flag = False
+                        continue
+                    cur.append(struct.unpack('>d', tmp)[0])
+                    if len(cur) < 5:
+                        continue
+                    f0.write(json.dumps(cur))
+                    f0.write("\n")
                     f.close()
+                f0.close()
             return new_dir + data_filename.replace(".bin", ".txt")
         elif data_filename.split(".")[-1] == "meta":
-            with open(os.path.join(data_dir, data_filename), "r") as f:
-                with open(new_dir + data_filename, "w") as f0:
+            with open(os.path.join(data_dir, data_filename), "r", encoding='utf-8', errors='ignore') as f:
+                data_filename = data_filename.split(".")
+                data_filename[-2] = "txt"
+                data_filename = ".".join(data_filename)
+                with open(new_dir + data_filename, "w", encoding='utf-8', errors='ignore') as f0:
                     f0.writelines(f.readlines())
+                    f0.close()
+                f.close()
             return new_dir + data_filename
 
     def on_any_event(self, event: FileSystemEvent):
@@ -76,22 +82,23 @@ class IMUUploadHandler(UploadHandler):
                 ft = self.executor.submit(self.check_and_upload, to_upload_path, True)
 
 def main(args):
-	config = load_config(args.config)
-	watching_path = config['data']['watching_dir']
-	logger = init_logger('imu-upload-elastic', config['data']['log_dir'])
-	with ThreadPoolExecutor() as executor:
-		event_handler = IMUUploadHandler(config, executor, logger)
-		event_handler.schedule_upload_folder(watching_path)
-		observer = Observer()
-		observer.schedule(event_handler, watching_path, recursive=True)
-		observer.start()
-		logger.info(f"Watching events for folder: {watching_path}")
-		try:
-			while True:
-				time.sleep(1)
-		except KeyboardInterrupt:
-			observer.stop()
-		observer.join()
+    config = load_config(args.config)
+    watching_path = config['data']['watching_dir']
+    upload_path = config['data']['upload_dir']
+    logger = init_logger('imu-upload-elastic', config['data']['log_dir'])
+    with ThreadPoolExecutor() as executor:
+        event_handler = IMUUploadHandler(config, executor, logger)
+        event_handler.schedule_upload_folder(upload_path)
+        observer = Observer()
+        observer.schedule(event_handler, watching_path, recursive=True)
+        observer.start()
+        logger.info(f"Watching events for folder: {watching_path}")
+        try:
+            while True:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            observer.stop()
+        observer.join()
 
 
 if __name__ == "__main__":
