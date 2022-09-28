@@ -18,16 +18,12 @@ class IMUUploadHandler(UploadHandler):
         super().__init__(config, executor, logger)
 
         try:
-            self.upload_imu_dir = config['data']['upload_imu_dir']
-            self.uploaded_imu_list_path = config['data']['uploaded_imu_list_path']
-            with open(self.uploaded_imu_list_path, 'r', encoding='utf-8') as fin:
-                self.uploaded_imu_set = set(line.strip() for line in fin)
+            self.upload_dir = config['data']['upload_dir']
         except:
-            self.uploaded_imu_list_path = "_uploaded_imu_list.txt"
-            self.uploaded_imu_set = set()
+            self.upload_dir = "./unpacked_imu"
 
     def convertBin(self, path: str):
-        new_dir = self.upload_imu_dir + "/"
+        new_dir = self.upload_dir + "/"
         if not os.path.exists(new_dir):
             os.mkdir(new_dir)
 
@@ -81,8 +77,8 @@ class IMUUploadHandler(UploadHandler):
 
 def main(args):
 	config = load_config(args.config)
-	watching_path = config['data']['watching_imu_dir']
-	logger = init_logger('imu-upload-elastic', config['data']['log_imu_dir'])
+	watching_path = config['data']['watching_dir']
+	logger = init_logger('imu-upload-elastic', config['data']['log_dir'])
 	with ThreadPoolExecutor() as executor:
 		event_handler = IMUUploadHandler(config, executor, logger)
 		event_handler.schedule_upload_folder(watching_path)
