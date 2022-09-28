@@ -1,6 +1,10 @@
 __pycache__
 *.pyc
 *.log
+imu*.txt
+*.bin
+*.meta
 config.yml
 http_ca.crt
 _uploaded_list.txt
+_uploaded_imu_list.txt
