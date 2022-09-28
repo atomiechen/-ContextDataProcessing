@@ -59,7 +59,7 @@ class IMUUploadHandler(UploadHandler):
                         continue
                     f0.write(json.dumps(cur))
                     f0.write("\n")
-                    f.close()
+                f.close()
                 f0.close()
             return new_dir + data_filename.replace(".bin", ".txt")
         elif data_filename.split(".")[-1] == "meta":
