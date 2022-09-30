@@ -27,18 +27,9 @@ class IMUUploadHandler(UploadHandler):
         if not os.path.exists(new_dir):
             os.mkdir(new_dir)
 
-        data_dir = path.split("/")
-        data_filename = data_dir[-1].split("\\")[-1]
-        data_dir[-1] = data_dir[-1].split("\\")[0]
-        data_dir = "/".join(data_dir) + "/"
-        filenames = os.listdir(data_dir)
+        data_dir, data_filename = os.path.split(path)
 
         if data_filename.split(".")[-1] == "bin":
-            # reason_filename = data_filename + ".meta"
-            # if reason_filename in filenames:
-                # with open(os.path.join(data_dir, reason_filename), "r") as f:
-                #     commits = json.loads(f.readline())
-                #     reason = commits["commit"].split("\n")[-1]
             with open(new_dir + data_filename.replace(".bin", ".txt"), "w", encoding='utf-8', errors='ignore') as f0:
                 times = 0
                 while True:
@@ -64,8 +55,10 @@ class IMUUploadHandler(UploadHandler):
                     cur.append(struct.unpack('>d', tmp)[0])
                     if len(cur) < 5:
                         continue
-                    f0.write(json.dumps(cur))
-                    f0.write("\n")
+                    f0.write(str(cur[0]))
+                    for i in range(1, 4):
+                        f0.write(", " + str(cur[i]))
+                    f0.write(", " + str(int(cur[4])) + "\n")
                 f.close()
             return new_dir + data_filename.replace(".bin", ".txt")
         elif data_filename.split(".")[-1] == "meta":
