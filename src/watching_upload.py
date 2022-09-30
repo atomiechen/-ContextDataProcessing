@@ -66,7 +66,8 @@ class UploadHandler(FileSystemEventHandler):
 					with open(meta_path, 'r', encoding='utf-8') as fin:
 						data = json.load(fin)
 					userid = data['userId']
-					if self.uploader.upload(abs_path, userid):
+					offset = data['CollectorResult']['offset_in_nano'] if ("offset_in_nano" in data['CollectorResult']) else -1
+					if self.uploader.upload(abs_path, userid, offset):
 						## record this uploaded file
 						with self.set_lock:
 							self.uploaded_set.add(abs_path)

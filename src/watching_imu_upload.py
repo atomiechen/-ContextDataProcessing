@@ -9,7 +9,7 @@ from concurrent.futures import Executor, Future, ThreadPoolExecutor
 import threading
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler, FileSystemEvent
-
+from IPython import embed
 from elastic_upload import ElasticUploader
 from utils import load_config, init_logger, init_stdout_logger
 
@@ -40,7 +40,14 @@ class IMUUploadHandler(UploadHandler):
                 #     commits = json.loads(f.readline())
                 #     reason = commits["commit"].split("\n")[-1]
             with open(new_dir + data_filename.replace(".bin", ".txt"), "w", encoding='utf-8', errors='ignore') as f0:
-                f = open(os.path.join(data_dir, data_filename), 'rb')
+                times = 0
+                while True:
+                    try:
+                        f = open(os.path.join(data_dir, data_filename), 'rb')
+                        break
+                    except:
+                        print(f"open times: {times}")
+                        continue
                 flag = True
                 while flag:
                     cur = []
