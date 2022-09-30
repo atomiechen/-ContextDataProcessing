@@ -30,7 +30,7 @@ class ElasticUploader:
 				## remove empty lines
 				if line.strip() != "":
 					if offset >= 0:
-						yield {"message": line, "userid": userid, "offset": offset}
+						yield {"message": line, "userid": userid, "offset_in_nano": offset}
 					else:
 						yield {"message": line, "userid": userid}
 
