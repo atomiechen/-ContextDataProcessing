@@ -9,7 +9,6 @@ from concurrent.futures import Executor, Future, ThreadPoolExecutor
 import threading
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler, FileSystemEvent
-from IPython import embed
 from elastic_upload import ElasticUploader
 from utils import load_config, init_logger, init_stdout_logger
 
