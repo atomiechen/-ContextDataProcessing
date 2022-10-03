@@ -13,5 +13,6 @@ data:
   filepath: <LOG_FILE_PATH>  ## required
   userid: <USER_ID>  ## required
   watching_dir: .  ## watching folder for file changes, current directory by default
+  upload_dir: <TXT_IMUDATA_DIR>
   uploaded_list_path: _uploaded_list.txt  ## uploaded file list
   log_dir: ./_logs  ## directory to save logs

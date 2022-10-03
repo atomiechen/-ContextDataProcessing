@@ -24,14 +24,17 @@ class ElasticUploader:
 		# Successful response!
 			self.logger.info(self.client.info())
 
-	def gen_doc(self, filepath: str, userid: str):
+	def gen_doc(self, filepath: str, userid: str, offset: int = -1):
 		with open(filepath, 'r', encoding='utf-8') as fin:
 			for line in fin:
 				## remove empty lines
 				if line.strip() != "":
-					yield {"message": line, "userid": userid}
+					if offset >= 0:
+						yield {"message": line, "userid": userid, "offset_in_nano": offset}
+					else:
+						yield {"message": line, "userid": userid}
 
-	def upload(self, filepath: str, userid: str):
+	def upload(self, filepath: str, userid: str, offset: int = -1):
 		total_docs = -1
 		successes = 0
 		## count non-empty documents
@@ -39,7 +42,7 @@ class ElasticUploader:
 			with open(filepath, 'r', encoding='utf-8') as fin:
 				total_docs = sum(1 for line in fin if line.strip())
 			for success, info in streaming_bulk(
-				client=self.client, actions=self.gen_doc(filepath, userid), index=self.config['index']):
+				client=self.client, actions=self.gen_doc(filepath, userid, offset), index=self.config['index']):
 				successes += success
 				if not success:
 					self.logger.info('A document failed:', info)
