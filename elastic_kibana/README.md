@@ -213,11 +213,13 @@ POST /log_volume/_delete_by_query
 runtime_vol_music
 
 ```
-if (!doc['musicVolume'].empty) { 
-    emit(doc['musicVolume'].value);
-} else if (!doc['systemVolume'].empty) { 
-    emit(doc['systemVolume'].value);
-}
+try {
+	if (!doc['musicVolume'].empty) { 
+        emit(doc['musicVolume'].value);
+    } else if (!doc['systemVolume'].empty) { 
+        emit(doc['systemVolume'].value);
+    }
+} catch (Exception e) {}
 ```
 
 等价的scripted field（已不推荐使用）：
@@ -237,11 +239,13 @@ if (!doc['musicVolume'].empty) {
 runtime_vol_music_percent
 
 ```
-if (!doc['musicVolume'].empty) { 
-    emit(100.0*doc['musicVolume'].value/doc['musicVolumeMax'].value);
-} else if (!doc['finalVolume'].empty) { 
-    emit(doc['finalVolume'].value);
-}
+try {
+    if (!doc['musicVolume'].empty) { 
+        emit(100.0*doc['musicVolume'].value/doc['musicVolumeMax'].value);
+    } else if (!doc['finalVolume'].empty) { 
+        emit(doc['finalVolume'].value);
+    }
+} catch (Exception e) {}
 ```
 
 
@@ -249,11 +253,13 @@ if (!doc['musicVolume'].empty) {
 runtime_app
 
 ```
-if (!doc['app.keyword'].empty) {
-    emit(doc['app.keyword'].value)
-} else if (!doc['new_app.keyword'].empty) {
-    emit(doc['new_app.keyword'].value)
-}
+try {
+    if (!doc['app.keyword'].empty) {
+        emit(doc['app.keyword'].value)
+    } else if (!doc['new_app.keyword'].empty) {
+        emit(doc['new_app.keyword'].value)
+    }
+} catch (Exception e) {}
 ```
 
 
@@ -261,16 +267,18 @@ if (!doc['app.keyword'].empty) {
 经纬度字符串解析为Geo point
 
 ```
-if (!doc['position_gps.keyword'].empty) {
-    def split_coor = doc['position_gps.keyword'].value.splitOnToken(',');
-    def lat = Double.parseDouble(split_coor[0]);
-    def lon = Double.parseDouble(split_coor[1]);
-    emit(lat,lon);
-} else if (!doc['now_position_gps.keyword'].empty) {
-    def split_coor = doc['now_position_gps.keyword'].value.splitOnToken(',');
-    def lat = Double.parseDouble(split_coor[0]);
-    def lon = Double.parseDouble(split_coor[1]);
-    emit(lat,lon);
-}
+try {
+    if (!doc['position_gps.keyword'].empty) {
+        def split_coor = doc['position_gps.keyword'].value.splitOnToken(',');
+        def lat = Double.parseDouble(split_coor[0]);
+        def lon = Double.parseDouble(split_coor[1]);
+        emit(lat,lon);
+    } else if (!doc['now_position_gps.keyword'].empty) {
+        def split_coor = doc['now_position_gps.keyword'].value.splitOnToken(',');
+        def lat = Double.parseDouble(split_coor[0]);
+        def lon = Double.parseDouble(split_coor[1]);
+        emit(lat,lon);
+    }
+} catch (Exception e) {}
 ```
 
