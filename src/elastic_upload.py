@@ -42,7 +42,7 @@ class ElasticUploader:
 			with open(filepath, 'r', encoding='utf-8') as fin:
 				total_docs = sum(1 for line in fin if line.strip())
 			for success, info in streaming_bulk(
-				client=self.client, actions=self.gen_doc(filepath, userid, offset), index=self.config['index']):
+				client=self.client, actions=self.gen_doc(filepath, userid, offset), index=self.config['index'], max_retries=10):
 				successes += success
 				if not success:
 					self.logger.info('A document failed:', info)
