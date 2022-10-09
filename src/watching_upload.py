@@ -12,7 +12,12 @@ from elastic_upload import ElasticUploader
 from utils import load_config, init_logger, init_stdout_logger
 
 
+## 重传次数
 MAX_RETRY_META = 10
+MAX_RETRY_FILE = 10
+## 重传间隔
+INTERVAL_RETRY_META = 0.1
+INTERVAL_RETRY_FILE = 2
 
 
 class UploadHandler(FileSystemEventHandler):
@@ -39,7 +44,7 @@ class UploadHandler(FileSystemEventHandler):
 	def on_any_event(self, event: FileSystemEvent):
 		self.logger.info(f'Event: {event.event_type} Path: {event.src_path}')
 		if event.event_type == 'created':
-			### 受到新建文件事件后，总是重新上传以更新文档，因此force_upload=True
+			### 收到新建文件事件后，总是重新上传以更新文档，因此force_upload=True
 			ft = self.executor.submit(self.check_and_upload, event.src_path, True)
 
 	def check_and_upload(self, path: str, force_upload=False):
@@ -76,19 +81,27 @@ class UploadHandler(FileSystemEventHandler):
 								break
 						except json.JSONDecodeError:
 							if meta_retry > 0:
-								time.sleep(0.1)
+								time.sleep(INTERVAL_RETRY_META)
 							else:
-								raise Exception(f"json.JSONDecodeError reaches max {MAX_RETRY_META} retries")
+								raise Exception(f"json.JSONDecodeError reaches {MAX_RETRY_META} retries, {INTERVAL_RETRY_META}s each")
 					userid = data['userId']
 					offset = data['CollectorResult']['offset_in_nano'] if ("offset_in_nano" in data['CollectorResult']) else -1
-					if self.uploader.upload(abs_path, userid, offset):
-						## record this uploaded file
-						with self.set_lock:
-							self.uploaded_set.add(abs_path)
-							self.write_uploaded_list()
-						self.logger.info(f"Uploaded: {abs_path}")
-					else:
-						self.logger.error(f"Failed to upload: {abs_path}")
+					## if failing to upload file, retry
+					file_retry = MAX_RETRY_FILE
+					while True:
+						file_retry -= 1
+						if self.uploader.upload(abs_path, userid, offset):
+							## record this uploaded file
+							with self.set_lock:
+								self.uploaded_set.add(abs_path)
+								self.write_uploaded_list()
+							self.logger.info(f"Uploaded: {abs_path}")
+							break
+						else:
+							if file_retry > 0:
+								time.sleep(INTERVAL_RETRY_FILE)
+							else:
+								raise Exception(f"File upload reaches {MAX_RETRY_FILE} retries, {INTERVAL_RETRY_FILE}s each")
 				except Exception as e:
 					self.logger.exception(f"Failed to upload: {abs_path}, with exception: {e}")
 
