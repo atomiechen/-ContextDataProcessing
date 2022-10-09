@@ -12,6 +12,9 @@ from elastic_upload import ElasticUploader
 from utils import load_config, init_logger, init_stdout_logger
 
 
+MAX_RETRY_META = 10
+
+
 class UploadHandler(FileSystemEventHandler):
 	def __init__(self, config: dict, executor: Executor, logger: Logger = None):
 		super().__init__()
@@ -63,8 +66,19 @@ class UploadHandler(FileSystemEventHandler):
 			if need_upload:
 				## get user ID from meta file
 				try:
-					with open(meta_path, 'r', encoding='utf-8') as fin:
-						data = json.load(fin)
+					## if failing to read meta file due to JSONDecodeError, retry
+					meta_retry = MAX_RETRY_META
+					while True:
+						try:
+							meta_retry -= 1
+							with open(meta_path, 'r', encoding='utf-8') as fin:
+								data = json.load(fin)
+								break
+						except json.JSONDecodeError:
+							if meta_retry > 0:
+								time.sleep(0.1)
+							else:
+								raise Exception(f"json.JSONDecodeError reaches max {MAX_RETRY_META} retries")
 					userid = data['userId']
 					offset = data['CollectorResult']['offset_in_nano'] if ("offset_in_nano" in data['CollectorResult']) else -1
 					if self.uploader.upload(abs_path, userid, offset):
