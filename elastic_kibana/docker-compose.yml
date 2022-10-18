@@ -2,6 +2,7 @@ version: "3"
 
 services:
   elasticsearch:
+    container_name: context-elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch:8.4.1
     ports:
       - 19213:9200
@@ -9,9 +10,15 @@ services:
     environment:
       - "ES_JAVA_OPTS=-Xms4g -Xmx4g"  # 内存设置，最大和最小heap size都是4G
       - "discovery.type=single-node" # 以单一节点模式启动
+      - "path.data=/esdatadir/data"  # 配置docker内elastic数据data路径
+      - "path.logs=/esdatadir/logs"  # 配置docker内elastic数据logs路径
+    volumes:
+      - ./esdatadir/data:/esdatadir/data  # elastic数据data目录，配合上面配置的路径
+      - ./esdatadir/logs:/esdatadir/logs  # elastic数据logs目录，配合上面配置的路径
     restart: always
 
   kibana:
+    container_name: context-kibana
     image: docker.elastic.co/kibana/kibana:8.4.1
     ports:
       - 15613:5601
