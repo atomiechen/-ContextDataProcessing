@@ -1,0 +1,24 @@
+version: "3"
+
+services:
+  jupyter:
+    container_name: context-jupyter
+    image: cschranz/gpu-jupyter:v1.4_cuda-11.2_ubuntu-20.04_slim
+    ports:
+      - 29503:8888
+    deploy:
+      resources:
+        reservations:
+          # only Docker Compose v1.28.0+ supports
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    volumes:
+      - ./data:/home/jovyan  # 挂载数据目录到容器里的工作目录
+    user: root  # enable sudo permissions
+    environment:
+      GRANT_SUDO: "yes"
+      JUPYTER_ENABLE_LAB: "yes"
+      NOTEBOOK_ARGS: "--collaborative"
+    restart: always

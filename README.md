@@ -20,3 +20,9 @@ docker-compose up -d
 
 参见：[Elasticsearch & Kibana 配置](./elastic_kibana/README.md)
 
+
+
+## Jupyter-GPU Docker配置
+
+参见：[Jupyter-GPU Docker配置](./jupyter_gpu/README.md)
+
