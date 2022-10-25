@@ -1,0 +1,37 @@
+{
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "range": {
+            "@timestamp": {
+              "gte": "2022-10-14T00:00:00.000",
+              "lte": "2022-10-21T00:00:00.000",
+              "time_zone": "+08:00"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "sort": [
+    {
+      "userid": {
+        "order": "asc"
+      }
+    },
+    {
+      "@timestamp": {
+        "order": "asc"
+      }
+    },
+    {
+      "evt_logid": {
+        "order": "asc"
+      }
+    }
+  ], 
+  "_source": {
+    "excludes": [ "@timestamp", "message" ]
+  }
+}

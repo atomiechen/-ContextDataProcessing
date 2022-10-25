@@ -11,4 +11,4 @@ docker run --rm -it \
 	-w /data \
 	-e NODE_TLS_REJECT_UNAUTHORIZED=0 \
 	elasticdump/elasticsearch-dump \
-	./command.sh
+	$(dirname $0)/command.sh
