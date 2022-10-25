@@ -8,3 +8,4 @@ config.yml
 http_ca.crt
 _uploaded_list.txt
 _uploaded_imu_list.txt
+config_auth
