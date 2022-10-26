@@ -1,10 +1,9 @@
-## docker-compose run --rm elasticdump
+## docker-compose run --rm elasticdump [args]
 
 version: "3"
 
 services:
   elasticdump:
-    container_name: context-elasticdump
     image: elasticdump/elasticsearch-dump
     volumes:
       - .:/data  # 挂载数据目录到容器里的工作目录
@@ -14,4 +13,4 @@ services:
     network_mode: host
     stdin_open: true
     tty: true
-    command: ./command.sh
+    entrypoint: ./command.sh

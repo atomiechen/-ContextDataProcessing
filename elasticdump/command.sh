@@ -8,10 +8,11 @@ set +a
 
 elasticdump \
 	--input=https://$user:$password@localhost:29500/log_volume \
-	--output=download.ndjson --overwrite \
+	--output "$@" \
 	--type=data \
 	--searchBody=@$(dirname $0)/searchbody.json \
 	--sourceOnly \
 	--limit=10000 \
-	--fileSize=100mb
+	--fileSize=100mb \
+	--csvIgnoreAutoColumns=true \
 	# --searchBody="{\"query\":{\"term\":{\"userid\": \"userid_test_userid\"}}}" \
