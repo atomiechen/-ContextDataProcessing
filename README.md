@@ -22,6 +22,29 @@ docker-compose up -d
 
 
 
+## Elasticdump使用
+
+进入`elasticdump`文件夹，需要配置：
+
+- 在`config_auth`中配置ES用户名和密码（从`config_auth_template`拷贝）；
+- 在`command.sh`中配置index及其他elasticdump参数。
+
+两种运行方法：
+
+- 如果已经装好elasticdump，可以在指定输出文件名后运行`command.sh`脚本
+
+  ```sh
+  ./command.sh <输出文件名>
+  ```
+
+- 如果使用docker方法，可以在指定输出文件名后运行`run_docker_elasticdump.sh`脚本
+
+  ```sh
+  ./run_docker_elasticdump.sh <输出文件名>
+  ```
+
+
+
 ## Jupyter-GPU Docker配置
 
 参见：[Jupyter-GPU Docker配置](./jupyter_gpu/README.md)
