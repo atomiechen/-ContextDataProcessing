@@ -17,7 +17,7 @@ services:
               capabilities: [gpu]
     volumes:
       - ./data:/home/jovyan  # 挂载数据目录到容器里的工作目录
-    user: root  # enable sudo permissions
+    # user: root  # enable sudo permissions
     environment:
       GRANT_SUDO: "yes"
       JUPYTER_ENABLE_LAB: "yes"
