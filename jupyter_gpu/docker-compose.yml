@@ -4,7 +4,8 @@ services:
   jupyter:
     container_name: context-jupyter
     # image: cschranz/gpu-jupyter:v1.4_cuda-11.2_ubuntu-20.04_slim
-    image: atomie/gpu-jupyter:v1.4_cuda-11.2_ubuntu-20.04_slim_updated
+    # image: atomie/gpu-jupyter:v1.4_cuda-11.2_ubuntu-20.04_slim_updated
+    image: atomie/gpu-jupyter:squash
     ports:
       - 29503:8888
     deploy:
@@ -16,7 +17,7 @@ services:
               count: all
               capabilities: [gpu]
     volumes:
-      - ./data:/home/jovyan  # 挂载数据目录到容器里的工作目录
+      - ./data:/home/jovyan/work  # 挂载数据目录到容器里的工作目录
     # user: root  # enable sudo permissions
     environment:
       GRANT_SUDO: "yes"
