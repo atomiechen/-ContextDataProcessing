@@ -11,4 +11,4 @@ RUN --mount=type=cache,target=/opt/conda/pkgs \
 	conda install --yes -c conda-forge jupytext && \
 	conda install --yes -c anaconda graphviz && \
 	conda clean -all --yes --verbose && \
-	echo -e "\nc.ContentsManager.allow_hidden = True" >> etc/jupyter/jupyter_server_config.py
+	echo -e "\nc.ContentsManager.allow_hidden = True" >> /etc/jupyter/jupyter_server_config.py
