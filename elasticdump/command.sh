@@ -10,9 +10,10 @@ elasticdump \
 	--input=https://$user:$password@localhost:29500/log_volume \
 	--output "$@" \
 	--type=data \
-	--searchBody=@$(dirname $0)/searchbody.json \
 	--sourceOnly \
 	--limit=10000 \
 	--fileSize=100mb \
 	--csvIgnoreAutoColumns=true \
+	--searchBody=@$(dirname $0)/searchbody.json \
+	# --searchBody=@$(dirname $0)/searchbody_patch.json \
 	# --searchBody="{\"query\":{\"term\":{\"userid\": \"userid_test_userid\"}}}" \

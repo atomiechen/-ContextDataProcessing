@@ -1,0 +1,248 @@
+{
+  "query": {
+    "bool": {
+      "should": [
+        {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "@timestamp": {
+                    "gte": "2022-10-28T00:00:00.000",
+                    "lte": "2022-11-02T00:00:00.000",
+                    "time_zone": "+08:00"
+                  }
+                }
+              },
+              {
+                "term": {
+                  "userid": "userid_06wjy"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "@timestamp": {
+                    "gte": "2022-10-28T00:00:00.000",
+                    "lte": "2022-10-30T00:00:00.000",
+                    "time_zone": "+08:00"
+                  }
+                }
+              },
+              {
+                "term": {
+                  "userid": "userid_12ljy"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "@timestamp": {
+                    "gte": "2022-10-28T00:00:00.000",
+                    "lte": "2022-11-01T00:00:00.000",
+                    "time_zone": "+08:00"
+                  }
+                }
+              },
+              {
+                "term": {
+                  "userid": "userid_13lyf"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "@timestamp": {
+                    "gte": "2022-10-28T00:00:00.000",
+                    "lte": "2022-10-29T00:00:00.000",
+                    "time_zone": "+08:00"
+                  }
+                }
+              },
+              {
+                "term": {
+                  "userid": "userid_16ljw"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "@timestamp": {
+                    "gte": "2022-10-28T00:00:00.000",
+                    "lte": "2022-10-29T00:00:00.000",
+                    "time_zone": "+08:00"
+                  }
+                }
+              },
+              {
+                "term": {
+                  "userid": "userid_28wd"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "@timestamp": {
+                    "gte": "2022-10-28T00:00:00.000",
+                    "lte": "2022-10-29T00:00:00.000",
+                    "time_zone": "+08:00"
+                  }
+                }
+              },
+              {
+                "term": {
+                  "userid": "userid_49ly"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "@timestamp": {
+                    "gte": "2022-10-28T00:00:00.000",
+                    "lte": "2022-10-31T00:00:00.000",
+                    "time_zone": "+08:00"
+                  }
+                }
+              },
+              {
+                "term": {
+                  "userid": "userid_53wyd"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "@timestamp": {
+                    "gte": "2022-10-28T00:00:00.000",
+                    "lte": "2022-10-30T00:00:00.000",
+                    "time_zone": "+08:00"
+                  }
+                }
+              },
+              {
+                "term": {
+                  "userid": "userid_55xmy"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "@timestamp": {
+                    "gte": "2022-10-28T00:00:00.000",
+                    "lte": "2022-10-31T00:00:00.000",
+                    "time_zone": "+08:00"
+                  }
+                }
+              },
+              {
+                "term": {
+                  "userid": "userid_61yyn"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "@timestamp": {
+                    "gte": "2022-10-28T00:00:00.000",
+                    "lte": "2022-10-29T00:00:00.000",
+                    "time_zone": "+08:00"
+                  }
+                }
+              },
+              {
+                "term": {
+                  "userid": "userid_62ysc"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "@timestamp": {
+                    "gte": "2022-10-28T00:00:00.000",
+                    "lte": "2022-10-29T00:00:00.000",
+                    "time_zone": "+08:00"
+                  }
+                }
+              },
+              {
+                "term": {
+                  "userid": "userid_71zjr"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "sort": [
+    {
+      "userid": {
+        "order": "asc"
+      }
+    },
+    {
+      "@timestamp": {
+        "order": "asc"
+      }
+    },
+    {
+      "evt_logid": {
+        "order": "asc"
+      }
+    }
+  ], 
+  "_source": {
+    "excludes": [ "@timestamp", "message", "gsonUtilsToString" ]
+  }
+}
