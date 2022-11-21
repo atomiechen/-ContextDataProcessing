@@ -1,3 +1,5 @@
+# USER_PASS=$(cat user_pass.txt) docker-compose up -d
+
 version: "3"
 
 services:
@@ -8,6 +10,7 @@ services:
     image: atomie/gpu-jupyter:squash
     ports:
       - 29503:8888
+      - 29505:22
     deploy:
       resources:
         reservations:
@@ -18,9 +21,10 @@ services:
               capabilities: [gpu]
     volumes:
       - ./data:/home/jovyan/work  # 挂载数据目录到容器里的工作目录
-    # user: root  # enable sudo permissions
+    user: root  # enable sudo permissions
     environment:
       GRANT_SUDO: "yes"
       JUPYTER_ENABLE_LAB: "yes"
       NOTEBOOK_ARGS: "--collaborative"
     restart: always
+    command: bash -c "echo '${USER_PASS}' | chpasswd --encrypted && service ssh start && start-notebook.sh"
